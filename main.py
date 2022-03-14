@@ -43,11 +43,22 @@ def create_customer(request: Request, response: Response, params: CreateCustomer
     customer.first_name = params.first_name
     customer.last_name = params.last_name
     customer.email = params.email
-    # customer.phone = params.phone
+    customer.phone = params.phone
+
+    address = shopify.Address()
+    address.address1 = params.address1
+    address.address2 = params.address2
+    address.city = params.city
+    address.province = params.state
+    address.zip = params.zip
+    address.country = "US"
+    address.default = True
+
+    customer.addresses = [address]
     success = customer.save()
     shopify.ShopifyResource.clear_session()
-    # success = True
 
+    # success = True
     if not success:
         print(customer.errors.full_messages())
         response.status_code = status.HTTP_400_BAD_REQUEST
