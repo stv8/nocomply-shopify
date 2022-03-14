@@ -1,11 +1,13 @@
-from typing import Optional
-
-from fastapi import FastAPI, Response, status
 import uvicorn
-from starlette.middleware.cors import CORSMiddleware
 import shopify
-from config import get_config
 
+from typing import Optional
+from fastapi import FastAPI, Request, Response, status
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
+from starlette.middleware.cors import CORSMiddleware
+
+from config import get_config
 from schemas import CreateCustomerParams
 
 
@@ -33,7 +35,7 @@ def health_check():
 
 
 @app.post("/customers")
-def create_customer(response: Response, params: CreateCustomerParams):
+def create_customer(request: Request, response: Response, params: CreateCustomerParams):
     session = shopify.Session(shop_url, api_version, access_token)
     shopify.ShopifyResource.activate_session(session)
 
@@ -44,11 +46,15 @@ def create_customer(response: Response, params: CreateCustomerParams):
     # customer.phone = params.phone
     success = customer.save()
     shopify.ShopifyResource.clear_session()
+    # success = True
 
     if not success:
         print(customer.errors.full_messages())
         response.status_code = status.HTTP_400_BAD_REQUEST
         return {"status": "error", "message": customer.errors.full_messages()}
+
+    if request.headers.get('HX-Request'):
+        return HTMLResponse(content="<div>Success!</div>", status_code=200)
 
     return {"status": "ok"}
 
