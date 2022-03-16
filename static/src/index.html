@@ -8,34 +8,37 @@
     <title>No Comply Demo</title>
     <link rel="stylesheet" href="styles/styles.css" />
     <link rel="stylesheet" href="styles/water-dark.css">
+    <script src="scripts/htmx/dist/htmx.min.js"></script>
+    <script src="scripts/htmx/dist/ext/json-enc.js"></script>
 </head>
 
 <body>
     <img src="https://cdn.shopify.com/s/files/1/2919/3396/files/NC.Box_Tag.jpg?width=700" />
     <h1>Please Enter Your Information</h1>
+    <p>* Required Fields</p>
     <form hx-post="/customers" hx-ext="json-enc" hx-swap="afterend">
-        <label for="email">Email</label>
+        <label for="email">Email *</label>
         <input type="email" name="email" id="email" placeholder="john.doe@gmail.com" required>
 
-        <label for="first_name">First Name</label>
+        <label for="first_name">First Name *</label>
         <input type="text" name="first_name" id="first_name" required>
 
-        <label for="last_name">Last Name</label>
+        <label for="last_name">Last Name *</label>
         <input type="text" name="last_name" id="last_name">
 
-        <label for="phone">Phone (10 digits)</label>
+        <label for="phone">Phone * (10 digits)</label>
         <input id="phone" name="phone" type="tel" required pattern="[0-9]{10}" placeholder="1234567890">
 
-        <label for="address1">Address 1</label>
+        <label for="address1">Address 1 *</label>
         <input type="text" name="address1" id="address1" required>
 
         <label for="address1">Address 2</label>
         <input type="text" name="address2" id="address2" placeholder="apt #, unit, etc">
 
-        <label for="city">City</label>
+        <label for="city">City *</label>
         <input type="text" name="city" id="city" required>
 
-        <label for="state">State</label>
+        <label for="state">State *</label>
         <select name="state" required>
             <option value="" disabled="">State</option>
             <option value="AL">Alabama</option>
@@ -99,15 +102,12 @@
             <option value="WY">Wyoming</option>
         </select>
 
-        <label for="zip">Zip (5 digits)</label>
+        <label for="zip">Zip * (5 digits)</label>
         <input type="text" name="zip" id="zip" required pattern="[0-9]{5}" >
         <br/>
         <input type="submit" value="Submit">
     </form>
     <footer></footer>
-
-    <script src="scripts/htmx/dist/htmx.min.js.gz"></script>
-    <script src="scripts/htmx/dist/ext/json-enc.js"></script>
 </body>
 
 </html>

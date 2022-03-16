@@ -2,7 +2,7 @@ import uvicorn
 import shopify
 
 from typing import Optional
-from fastapi import FastAPI, Request, Response, status
+from fastapi import FastAPI, Request, Response, status, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
@@ -10,6 +10,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from config import get_config
 from schemas import CreateCustomerParams
+import shopify_patch
 
 
 config = get_config()
@@ -36,15 +37,21 @@ def health_check():
 
 
 @app.post("/customers")
-def create_customer(request: Request, response: Response, params: CreateCustomerParams):
+def create_customer_route(
+    request: Request, response: Response, params: CreateCustomerParams
+):
     session = shopify.Session(shop_url, api_version, access_token)
     shopify.ShopifyResource.activate_session(session)
 
-    customer = shopify.Customer()
+    customer = shopify.Customer().find_first(email=params.email, phone=params.phone)
+    if not customer:
+        print("missing customer")
+        customer = shopify.Customer()
+        customer.email = params.email
+        customer.phone = params.phone
+
     customer.first_name = params.first_name
     customer.last_name = params.last_name
-    customer.email = params.email
-    customer.phone = params.phone
 
     address = shopify.Address()
     address.address1 = params.address1
@@ -72,18 +79,31 @@ def create_customer(request: Request, response: Response, params: CreateCustomer
 
 
 @app.get("/customers")
-def get_customer(email: str):
+def get_customer_route(email: str, phone: str):
+    customer = get_customer(email, phone)
+    return {"status": "ok", "customer": { "name": customer.first_name }}
+
+
+def get_customer(email: str, phone: str):
     session = shopify.Session(shop_url, api_version, access_token)
     shopify.ShopifyResource.activate_session(session)
+    # there could be multiple customers with email via find()
+    try:
+        # try email first then phone
+        customer = shopify.Customer().find_first(email=email, phone=phone)
+        if not customer:
+            shopify.ShopifyResource.clear_session()
+            return None
+        else:
+            # [print(c.verified_email) for c in customer]
+            print(customer.first_name)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="derp")
+    finally:
+        shopify.ShopifyResource.clear_session()
 
-    customer = shopify.Customer().find(email=email)
-    if not customer:
-        print(customer.errors.full_messages())
-    else:
-        [print(c.verified_email) for c in customer]
-
-    shopify.ShopifyResource.clear_session()
-    return {"status": "ok"}
+    return customer
 
 
 app.mount("/", StaticFiles(directory="static/src", html=True), name="static")
