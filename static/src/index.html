@@ -6,12 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>No Comply Demo</title>
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
-    <script src="https://unpkg.com/htmx.org@1.7.0"
-        integrity="sha384-EzBXYPt0/T6gxNp0nuPtLkmRpmDBbjg6WmCUZRLXBBwYYmwAUxzlSGej0ARHX0Bo"
-        crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/htmx.org@1.7.0/dist/ext/json-enc.js"></script>
+    <link rel="stylesheet" href="styles/styles.css" />
+    <link rel="stylesheet" href="styles/water-dark.css">
 </head>
 
 <body>
@@ -34,7 +30,7 @@
         <input type="text" name="address1" id="address1" required>
 
         <label for="address1">Address 2</label>
-        <input type="text" name="address2" id="address2">
+        <input type="text" name="address2" id="address2" placeholder="apt #, unit, etc">
 
         <label for="city">City</label>
         <input type="text" name="city" id="city" required>
@@ -109,6 +105,9 @@
         <input type="submit" value="Submit">
     </form>
     <footer></footer>
+
+    <script src="scripts/htmx/dist/htmx.min.js.gz"></script>
+    <script src="scripts/htmx/dist/ext/json-enc.js"></script>
 </body>
 
 </html>
