@@ -30,9 +30,6 @@ access_token = config.ACCESS_TOKEN
 api_version = "2022-01"
 
 
-app.mount("/", StaticFiles(directory="static/src", html=True), name="static")
-
-
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
@@ -68,7 +65,7 @@ def create_customer(request: Request, response: Response, params: CreateCustomer
         response.status_code = status.HTTP_400_BAD_REQUEST
         return {"status": "error", "message": customer.errors.full_messages()}
 
-    if request.headers.get('HX-Request'):
+    if request.headers.get("HX-Request"):
         return HTMLResponse(content="<div>Success!</div>", status_code=200)
 
     return {"status": "ok"}
@@ -88,6 +85,8 @@ def get_customer(email: str):
     shopify.ShopifyResource.clear_session()
     return {"status": "ok"}
 
+
+app.mount("/", StaticFiles(directory="static/src", html=True), name="static")
 
 kwargs = {"host": "0.0.0.0", "port": 9000, "reload": config.RELOAD}
 
