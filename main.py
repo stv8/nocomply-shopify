@@ -3,6 +3,7 @@ import shopify
 
 from typing import Optional
 from fastapi import FastAPI, Request, Response, status
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from starlette.middleware.cors import CORSMiddleware
@@ -29,7 +30,10 @@ access_token = config.ACCESS_TOKEN
 api_version = "2022-01"
 
 
-@app.get("/")
+app.mount("/", StaticFiles(directory="static/src", html=True), name="static")
+
+
+@app.get("/health")
 def health_check():
     return {"status": "ok"}
 
@@ -85,7 +89,7 @@ def get_customer(email: str):
     return {"status": "ok"}
 
 
-kwargs = {"host": "0.0.0.0", "port": 9000, "reload": True}
+kwargs = {"host": "0.0.0.0", "port": 9000, "reload": config.RELOAD}
 
 if __name__ == "__main__":
     uvicorn.run("main:app", **kwargs)
