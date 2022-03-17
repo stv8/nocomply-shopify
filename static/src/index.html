@@ -6,39 +6,75 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>No Comply Demo</title>
-    <link rel="stylesheet" href="styles/styles.css" />
     <link rel="stylesheet" href="styles/water-dark.css">
+    <link rel="stylesheet" href="styles/styles.css" />
     <script src="scripts/htmx/htmx.min.js"></script>
     <script src="scripts/htmx/ext/json-enc.js"></script>
+    <script>
+        window.onload = () => {
+            document.body.addEventListener('htmx:beforeRequest', evt => {
+                htmx.addClass(htmx.find('.modal'), 'active');
+            })
+            document.body.addEventListener('htmx:afterRequest', evt => {
+                htmx.removeClass(htmx.find('.modal'), 'active');
+                scrollTo(0,0);
+            })
+            document.body.addEventListener('htmx:beforeSwap', function(evt) {
+                console.log(evt);
+                if (evt.detail.xhr.status === 200) {
+                    if (evt.detail.pathInfo.path.includes("/customers")) {
+                        document.getElementById("form").reset();
+                    }
+                } else if(evt.detail.xhr.status === 404){
+                    alert("Error: Could Not Find Resource");
+                } else if(evt.detail.xhr.status === 400){
+                    // allow 422 responses to swap as we are using this as a signal that
+                    // a form was submitted with bad data and want to rerender with the
+                    // errors
+                    //
+                    // set isError to false to avoid error logging in console
+                    evt.detail.shouldSwap = true;
+                    evt.detail.isError = false;
+                }
+            });
+        }
+    </script>
 </head>
 
 <body>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+          <p>Loading...</p>
+        </div>
+      </div>
     <img src="https://cdn.shopify.com/s/files/1/2919/3396/files/NC.Box_Tag.jpg?width=700" />
     <h1>Please Enter Your Information</h1>
     <p>* Required Fields</p>
-    <form hx-post="/customers" hx-ext="json-enc" hx-swap="afterend">
-        <label for="email">Email *</label>
+    <div id="status"></div>
+    <br/>
+    <form id="form" hx-post="/customers" hx-ext="json-enc" hx-target="#status" hx-swap="innerHTML">
+        <label for="email">* Email</label>
         <input type="email" name="email" id="email" placeholder="john.doe@gmail.com" required>
 
-        <label for="first_name">First Name *</label>
-        <input type="text" name="first_name" id="first_name" required>
-
-        <label for="last_name">Last Name *</label>
-        <input type="text" name="last_name" id="last_name">
-
-        <label for="phone">Phone * (10 digits)</label>
+        <label for="phone">* Phone (10 digits)</label>
         <input id="phone" name="phone" type="tel" required pattern="[0-9]{10}" placeholder="1234567890">
 
-        <label for="address1">Address 1 *</label>
+        <label for="first_name">* First Name</label>
+        <input type="text" name="first_name" id="first_name" required>
+
+        <label for="last_name">* Last Name</label>
+        <input type="text" name="last_name" id="last_name">
+
+        <label for="address1">* Address 1</label>
         <input type="text" name="address1" id="address1" required>
 
         <label for="address1">Address 2</label>
         <input type="text" name="address2" id="address2" placeholder="apt #, unit, etc">
 
-        <label for="city">City *</label>
+        <label for="city">* City</label>
         <input type="text" name="city" id="city" required>
 
-        <label for="state">State *</label>
+        <label for="state">* State</label>
         <select name="state" required>
             <option value="" disabled="">State</option>
             <option value="AL">Alabama</option>
@@ -102,7 +138,7 @@
             <option value="WY">Wyoming</option>
         </select>
 
-        <label for="zip">Zip * (5 digits)</label>
+        <label for="zip">* Zip (5 digits)</label>
         <input type="text" name="zip" id="zip" required pattern="[0-9]{5}" >
         <br/>
         <input type="submit" value="Submit">

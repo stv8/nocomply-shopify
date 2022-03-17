@@ -30,6 +30,20 @@ shop_url = config.SHOP_URL
 access_token = config.ACCESS_TOKEN
 api_version = "2022-01"
 
+email_taken_partial = """
+<br/>
+<div class='error-message'>Email is already taken.  Please enter another email.</div>
+"""
+
+phone_taken_partial = """
+<br/>
+<div class='error-message'>Phone # is already taken.  Please enter another phone number.</div>
+"""
+
+success_partial = """
+<br/>
+<div class='success-message'>Registration Successful!</div>
+"""
 
 @app.get("/health")
 def health_check():
@@ -45,7 +59,6 @@ def create_customer_route(
 
     customer = shopify.Customer().find_first(email=params.email, phone=params.phone)
     if not customer:
-        print("missing customer")
         customer = shopify.Customer()
         customer.email = params.email
         customer.phone = params.phone
@@ -68,12 +81,23 @@ def create_customer_route(
 
     # success = True
     if not success:
-        print(customer.errors.full_messages())
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return {"status": "error", "message": customer.errors.full_messages()}
+        errors = customer.errors.full_messages()
+        print(errors)
+        phone_taken = 'phone Phone has already been taken'
+        email_taken = 'email has already been taken'
+        error_response = """
+        <div class='error-message'>Errors</div>
+        """
+
+        if phone_taken in errors:
+            error_response += phone_taken_partial
+        if email_taken in errors:
+            error_response += email_taken_partial
+
+        return HTMLResponse(content=error_response, status_code=400)
 
     if request.headers.get("HX-Request"):
-        return HTMLResponse(content="<div>Success!</div>", status_code=200)
+        return HTMLResponse(content=success_partial, status_code=200)
 
     return {"status": "ok"}
 
@@ -81,7 +105,7 @@ def create_customer_route(
 @app.get("/customers")
 def get_customer_route(email: str, phone: str):
     customer = get_customer(email, phone)
-    return {"status": "ok", "customer": { "name": customer.first_name }}
+    return {"status": "ok", "customer": {"name": customer.first_name}}
 
 
 def get_customer(email: str, phone: str):
