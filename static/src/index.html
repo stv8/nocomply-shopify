@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>No Comply Demo</title>
-    <link rel="stylesheet" href="styles/water-dark.css">
+    <link rel="stylesheet" href="styles/water-light.css">
     <link rel="stylesheet" href="styles/styles.css" />
     <script src="scripts/htmx/htmx.min.js"></script>
     <script src="scripts/htmx/ext/json-enc.js"></script>
@@ -20,7 +20,6 @@
                 scrollTo(0,0);
             })
             document.body.addEventListener('htmx:beforeSwap', function(evt) {
-                console.log(evt);
                 if (evt.detail.xhr.status === 200) {
                     if (evt.detail.pathInfo.path.includes("/customers")) {
                         document.getElementById("form").reset();
@@ -49,9 +48,9 @@
       </div>
     <img src="https://svs-assets.nyc3.cdn.digitaloceanspaces.com/nocomply-temp/vans-slip-on-trek-qr-banner.jpg" />
     <h1>No-Comply Customer Registration</h1>
-    <p>Vans Slip-On Trek is late and will ship separately for free.</p>
-    <p>Please fill in your information below.</p>
-    <br/>
+    <p>Slip-On Trek is late and will ship separately for free.</p>
+    <p><b>Please fill in your information below.</b></p>
+    <div id="status"></div>
     <p>* Required Fields</p>
     <form id="form" hx-post="/customers" hx-ext="json-enc" hx-target="#status" hx-swap="innerHTML">
         <label for="email">* Email</label>
