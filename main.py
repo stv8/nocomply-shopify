@@ -32,12 +32,17 @@ api_version = "2022-01"
 
 email_taken_partial = """
 <br/>
-<div class='error-message'>Email is already taken.  Please enter another email.</div>
+<div class='error-message'>Email is already registered.  Please visit the next associate.</div>
 """
 
 phone_taken_partial = """
 <br/>
-<div class='error-message'>Phone # is already taken.  Please enter another phone number.</div>
+<div class='error-message'>Phone # is already registered.  Please visit the next associate.</div>
+"""
+
+phone_invalid_partial = """
+<br/>
+<div class='error-message'>Phone number invalid.</div>
 """
 
 success_partial = """
@@ -85,6 +90,7 @@ def create_customer_route(
         print(errors)
         phone_taken = 'phone Phone has already been taken'
         email_taken = 'email has already been taken'
+        phone_invalid = 'phone Enter a valid phone number to use this delivery method'
         error_response = """
         <div class='error-message'>Errors</div>
         """
@@ -93,6 +99,8 @@ def create_customer_route(
             error_response += phone_taken_partial
         if email_taken in errors:
             error_response += email_taken_partial
+        if phone_invalid in errors:
+            error_response += phone_invalid_partial
 
         return HTMLResponse(content=error_response, status_code=400)
 
