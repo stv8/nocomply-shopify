@@ -84,7 +84,6 @@ def create_customer_route(
     success = customer.save()
     shopify.ShopifyResource.clear_session()
 
-    # success = True
     if not success:
         errors = customer.errors.full_messages()
         print(errors)
@@ -119,7 +118,7 @@ def get_customer_route(email: str, phone: str):
 def get_customer(email: str, phone: str):
     session = shopify.Session(shop_url, api_version, access_token)
     shopify.ShopifyResource.activate_session(session)
-    # there could be multiple customers with email via find()
+
     try:
         # try email first then phone
         customer = shopify.Customer().find_first(email=email, phone=phone)
@@ -127,7 +126,6 @@ def get_customer(email: str, phone: str):
             shopify.ShopifyResource.clear_session()
             return None
         else:
-            # [print(c.verified_email) for c in customer]
             print(customer.first_name)
     except Exception as e:
         print(e)
